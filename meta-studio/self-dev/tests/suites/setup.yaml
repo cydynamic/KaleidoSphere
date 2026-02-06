@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Setup & Bootstrap Suite"
+
+prompts:
+  - file://../prompts/universal_loader.js
+
+# Import shared providers
+providers:
+  - file://../providers.yaml
+
+tests:
+  - description: "Cold Start: Create Bootloader"
+    vars:
+      skill_path: "../../../../skills/core/setup/SKILL.md"
+      user_message: "Initialize this empty project."
+      fs_state: "Empty Directory"
+    assert:
+      - type: icontains
+        value: "docs/start.md"
+      - type: icontains
+        value: "AGENTS.md"
+
+  - description: "Resume: Prevent Overwrite"
+    vars:
+      skill_path: "../../../../skills/core/setup/SKILL.md"
+      user_message: "Resume work."
+      fs_state: "docs/start.md exists, memory exists"
+    assert:
+      - type: not-contains
+        value: "WriteFile docs/start.md"
+      - type: icontains
+        value: "Read"

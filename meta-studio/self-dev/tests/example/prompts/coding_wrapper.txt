@@ -1,0 +1,9 @@
+{{ file://../../../../skills/core/coding/SKILL.md }}
+
+---
+**System Context**:
+You are the AI Agent defined above.
+Current Memory: {{ memory_content }}
+
+**User Instruction**:
+{{ user_message }}

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Workflow Strategy Suite"
+
+prompts:
+  - file://../prompts/universal_loader.js
+
+# Import shared providers
+providers:
+  - file://../providers.yaml
+
+# JUDGE Configuration
+defaultTest:
+  options:
+    provider:
+      id: anthropic:messages:claude-haiku-4-5-20251001
+      config:
+        apiKeyEnvar: ANTHROPIC_API_KEY
+        apiBaseUrl: https://api.anthropic.com/v1
+        temperature: 0
+        max_tokens: 1024
+
+tests:
+  - description: "Workflow Strategy: Show Final Flow"
+    vars:
+      skill_path: "../../../../skills/core/workflow/SKILL.md"
+      user_message: "Let's start the project workflow."
+      memory_content: "No injected steps"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST present the resolved flow order before execution and explain any changes. Please respond in Simplified Chinese."
+
+  - description: "Workflow Strategy: Design Gate"
+    vars:
+      skill_path: "../../../../skills/core/workflow/SKILL.md"
+      user_message: "Proceed with the workflow."
+      memory_content: "Default flow includes Design (optional)"
+    assert:
+      - type: llm-rubric
+        value: "Before entering Design, the agent MUST ask whether design is needed. Please respond in Simplified Chinese."
+
+  - description: "Workflow Strategy: Injection Handling"
+    vars:
+      skill_path: "../../../../skills/core/workflow/SKILL.md"
+      user_message: "Insert a review step after coding."
+      memory_content: "User requests injection"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST show the updated flow and ask for confirmation (no silent merge). Please respond in Simplified Chinese."
+
+  - description: "Workflow Strategy: Record Decisions"
+    vars:
+      skill_path: "../../../../skills/core/workflow/SKILL.md"
+      user_message: "Use the default flow and start."
+      memory_content: "project_context.md exists"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST mention recording the final flow in project_context. Please respond in Simplified Chinese."

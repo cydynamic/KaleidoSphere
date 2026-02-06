@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Workflow & State Management Suite"
+
+prompts:
+  - file://../prompts/universal_loader.js
+
+# Import shared providers
+providers:
+  - file://../providers.yaml
+
+tests:
+  - description: "Workflow: Pre-flight Progress Update"
+    vars:
+      skill_path: "../../../../skills/core/coding/SKILL.md"
+      user_message: "Start coding the Login Component."
+      memory_content: "Current Task: Subtask-01 (Pending)"
+    assert:
+      - type: icontains
+        value: "progress.md"
+      - type: javascript
+        value: "output.includes('Doing') || output.includes('In Progress') || output.includes('🟡')"
+
+  - description: "Workflow: Chat Room Logging"
+    vars:
+      skill_path: "../../../../skills/core/coding/SKILL.md"
+      user_message: "I have fixed the bug in auth.ts."
+      memory_content: "Active Threads: 1"
+    assert:
+      - type: javascript
+        value: "output.includes('chat-room.md') || output.includes('secretary')"

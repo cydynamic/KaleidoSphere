@@ -1,0 +1,9 @@
+{{ file://../../skills/core/coding/SKILL.md }}
+
+---
+[SYSTEM MOCK: Environment]
+- Memory: {{ memory_content }}
+- Git Status: {{ git_status }}
+
+[USER INPUT]
+{{ user_message }}

@@ -1,0 +1,65 @@
+# Shared Provider Configuration (Open Source Template)
+
+# 1. Claude
+- id: anthropic:messages:claude-3-5-sonnet-20240620
+  config:
+    apiKeyEnvar: ANTHROPIC_API_KEY
+    # apiBaseUrl: https://api.anthropic.com/v1
+    temperature: 0
+    max_tokens: 1024
+
+# 2. Gemini
+- id: google:gemini-1.5-pro
+  config:
+    apiKeyEnvar: GOOGLE_API_KEY
+    # apiBaseUrl: https://generativelanguage.googleapis.com/v1beta
+    temperature: 0
+    maxOutputTokens: 8192
+
+# 3. OpenAI (Standard Chat)
+- id: openai:chat:gpt-4o
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    temperature: 0
+
+# 4. Custom HTTP (Advanced SSE Example)
+# This example shows how to handle custom streaming formats and non-standard bodies
+- id: http
+  config:
+    # Replace with your actual endpoint
+    url: https://api.your-custom-proxy.com/v1/chat/completions
+    method: POST
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{env.OPENAI_API_KEY}}"
+    body:
+      model: gpt-4o
+      input:
+        - role: user
+          content: "{{prompt}}"
+      text:
+        verbosity: medium
+      stream: true
+      instructions: "You are a helpful assistant."
+    validateStatus: "(status) => status < 500"
+    transformResponse: |
+      (json, text) => {
+        // Handle JSON response
+        if (json && (json.output_text || json.response)) {
+          return json.output_text || json.response;
+        }
+        // Handle SSE Stream
+        let out = '';
+        for (const line of String(text || '').split('\n')) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ')) continue;
+          try {
+            const evt = JSON.parse(trimmed.slice(6));
+            // Custom delta parsing logic
+            if (evt.type === 'response.output_text.delta' && typeof evt.delta === 'string') {
+              out += evt.delta;
+            }
+          } catch {} // Ignore parsing errors
+        }
+        return out.trim();
+      }

@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+tmp/
+temp/
+node_modules/
+.idea/
+.vscode/
+*.swp
+.env
+.gemini/tmp/
+.kaleidosphere/
+docs/project-active/

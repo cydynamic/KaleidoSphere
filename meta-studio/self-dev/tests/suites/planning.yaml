@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Planning & Cognition Suite"
+
+prompts:
+  - file://../prompts/universal_loader.js
+
+# Import shared providers
+providers:
+  - file://../providers.yaml
+
+tests:
+  - description: "Cognition: Refuse Vague Request"
+    vars:
+      skill_path: "../../../../skills/core/planning/SKILL.md"
+      user_message: "Build a website."
+      fs_state: "Clean"
+    assert:
+      - type: javascript
+        # Expanded keywords to catch Chinese refusal or Pre-flight blocking
+        value: 'output.match(/Clarification|details|Question|more info|缺少|阻塞|Blocking|REJECTED|Missing|需要更多/i) !== null'
+
+  - description: "Cognition: Generate PRD Structure"
+    vars:
+      skill_path: "../../../../skills/core/planning/SKILL.md"
+      user_message: "Create a PRD for a Todo App."
+      fs_state: "Initial.md contains basic requirements"
+    assert:
+      # Expecting a draft PRD or a step-by-step plan
+      - type: javascript
+        # Use single quotes to avoid YAML escape issues with \.
+        value: 'output.match(/prd-draft\.md|Source ID|产品需求文档/i) !== null'

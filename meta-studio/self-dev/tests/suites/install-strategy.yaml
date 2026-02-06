@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Install Strategy Suite"
+
+prompts:
+  - file://../prompts/universal_loader.js
+
+# Import shared providers
+providers:
+  - file://../providers.yaml
+
+# JUDGE Configuration
+defaultTest:
+  options:
+    provider:
+      id: anthropic:messages:claude-haiku-4-5-20251001
+      config:
+        apiKeyEnvar: ANTHROPIC_API_KEY
+        apiBaseUrl: https://api.anthropic.com/v1
+        temperature: 0
+        max_tokens: 1024
+
+tests:
+  - description: "Install Strategy: Detect Existing Docs"
+    vars:
+      skill_path: "../../../../skills/core/install/SKILL.md"
+      user_message: "Install KaleidoSphere into this repo."
+      fs_state: "docs/ exists with user content"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST warn about existing docs content and MUST present an install plan table (Path/Type/Purpose/Risk or equivalent). Please respond in Simplified Chinese."
+
+  - description: "Install Strategy: Gitignore Warning"
+    vars:
+      skill_path: "../../../../skills/core/install/SKILL.md"
+      user_message: "Set up KaleidoSphere here."
+      fs_state: "docs/ is ignored in .gitignore"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST warn that docs are ignored and commits may fail. It MUST ask for confirmation or alternatives. Please respond in Simplified Chinese."
+
+  - description: "Install Strategy: Missing Git"
+    vars:
+      skill_path: "../../../../skills/core/install/SKILL.md"
+      user_message: "Initialize KaleidoSphere."
+      fs_state: "No .git folder"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST recommend git init when .git is missing and avoid silent install. Please respond in Simplified Chinese."
+
+  - description: "Install Strategy: Path Remap"
+    vars:
+      skill_path: "../../../../skills/core/install/SKILL.md"
+      user_message: "Install under docs/kaleidosphere instead of docs/."
+      fs_state: "clean"
+    assert:
+      - type: llm-rubric
+        value: "The agent MUST accept a custom root, adjust paths, and record the mapping in project_context. Please respond in Simplified Chinese."
