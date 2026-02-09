@@ -67,21 +67,32 @@ You have the following skills available (Auto-Load on intent):
 *   **Coding**: `.kaleidosphere/skills/core/coding/SKILL.md`
 *   **Analysis**: `.kaleidosphere/skills/core/analysis/SKILL.md`
 
-## 3. Execution Chain
+## 3. Non-Installed Detection Strategy (One-Time Prompt)
+If `.kaleidosphere/` is missing, apply the following detection strategy:
+1. Check `docs/project-active/memory/user_preferences_local.md` (user-local opt-out).
+   - If opt-out exists, do NOT ask again.
+2. If no opt-out exists, ask once:
+   - `git clone git@github.com:cydynamic/KaleidoSphere.git .kaleidosphere`
+   - `请读取 .kaleidosphere/docs/install.md 并安装系统。`
+3. If the user declines, record opt-out in
+   `docs/project-active/memory/user_preferences_local.md` and stop asking.
+
+## 4. Execution Chain
 **IMMEDIATELY** execute the user's request using the loaded context.
 **DO NOT** ask for confirmation.
 ```
 
-## 3. Project Git Hygiene
+## 4. Project Git Hygiene
 1.  **Check Git**: If the user's project root has no `.git`, recommend initializing Git (`git init`) to enable safe tracking.
 2.  **Ensure .gitignore**: In the user's project root, ensure `.gitignore` contains:
     ```
     .kaleidosphere/
     docs/project-active/
+    docs/project-active/memory/user_preferences_local.md
     ```
     *   If `.gitignore` is missing, **ASK USER** whether to create it and add the lines above.
 
-## 4. Active Workspace
+## 5. Active Workspace
 1.  Create directory `docs/project-active` (if missing).
 2.  **Initialize Git**: Run `git init` inside `docs/project-active` to create a Nested Repository for local history.
 3.  Create `docs/project-active/README.md` with:
@@ -96,13 +107,15 @@ You have the following skills available (Auto-Load on intent):
     *   **Lifecycle**: Active -> Refined -> Moved to `project-shared`.
     ```
 
-## 5. Configuration
-1.  **Preferences**: Check `docs/project-shared/memory/user_preferences.md`. If missing, create with:
+## 6. Configuration
+1.  **Preferences (Project)**: Check `docs/project-shared/memory/user_preferences.md`. If missing, create with:
     ```markdown
     # User Preferences
     - [System] AutoRecord: false (Default)
     ```
+2.  **Preferences (Local)**: Ensure `docs/project-active/memory/user_preferences_local.md` exists.
+    - This file is **user-local** and must be gitignored.
 
-## 6. Immediate Activation (Chain)
+## 7. Immediate Activation (Chain)
 **CRITICAL**: Installation is complete. Now you MUST **IMMEDIATELY READ and EXECUTE** the newly created `docs/start.md` to activate the system.
 **DO NOT STOP**.
